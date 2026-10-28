@@ -1,0 +1,434 @@
+[
+  {
+    "text": "The cement bags are out of stock today",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "All our solar panels have sold out",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "We ran out of waterproof boots this morning",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "No inventory left for the requested water pump",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "The last carton of tiles was already sold",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "Our shelves are empty and a restock is needed",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "The customer wanted rebar but our stock was depleted",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "We normally carry this paint but have none left",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "The warehouse has zero units of the requested heater",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "The item is temporarily unavailable until replenishment",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "Another buyer took the remaining stock of batteries",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "We could not supply the order because inventory is exhausted",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "The cement is too expensive for my budget",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "Can you offer a cheaper solar panel",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "Your price for boots is too high",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "The buyer asked for a discount on water pumps",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "I cannot afford the tiles at that price",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "The quoted amount is over budget",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "Please lower the price of the rebar",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "The cost of paint exceeds what I can spend",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "The heater is pricey and I need a more affordable option",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "We lost the sale because our prices were unaffordable",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "The battery costs more than the customer can pay",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "Customer requested a better price before buying",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "Do you sell white cement",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "We do not carry solar water heaters in our range",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Looking for waterproof work boots size 44",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Is this brand of pump part of your catalogue",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Customer searched for tiles that we do not sell",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "I need a product that is missing from your catalogue",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "We have never stocked stainless steel rebar",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Do you have purple exterior paint",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "A shopper asked for a brand we do not stock",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "This item is outside our product range",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Searching for lithium batteries in your shop",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Can you add these fittings to your assortment",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Customer rejected our quote and chose another supplier",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "The solar panel deal went to a competitor",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "Our tender for work boots was declined",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "Buyer went elsewhere after receiving the pump quotation",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "The customer accepted another vendor's proposal",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "We lost the bid to a competing business",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "The rebar quotation was turned down",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "They chose another company for the paint contract",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "The heater quote was not accepted by procurement",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "Client declined our offer and purchased elsewhere",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "Our battery proposal was unsuccessful",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "A rival supplier won the order after the quote review",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "Delivery of cement will take too long",
+    "reason": "lead_time"
+  },
+  {
+    "text": "I cannot wait three weeks for solar panels",
+    "reason": "lead_time"
+  },
+  {
+    "text": "The boots would arrive after our deadline",
+    "reason": "lead_time"
+  },
+  {
+    "text": "Your pump delivery time does not work for us",
+    "reason": "lead_time"
+  },
+  {
+    "text": "We need tiles tomorrow but shipping takes a month",
+    "reason": "lead_time"
+  },
+  {
+    "text": "The lead time is longer than the project schedule",
+    "reason": "lead_time"
+  },
+  {
+    "text": "Rebar cannot be delivered in time for the job",
+    "reason": "lead_time"
+  },
+  {
+    "text": "The paint shipment was delayed beyond the required date",
+    "reason": "lead_time"
+  },
+  {
+    "text": "When can you deliver the heater I cannot wait",
+    "reason": "lead_time"
+  },
+  {
+    "text": "Customer cancelled because delivery was too slow",
+    "reason": "lead_time"
+  },
+  {
+    "text": "Battery installation cannot happen soon enough",
+    "reason": "lead_time"
+  },
+  {
+    "text": "The earliest arrival date misses the construction deadline",
+    "reason": "lead_time"
+  },
+  {
+    "text": "The cement enquiry went quiet with no response",
+    "reason": "abandoned"
+  },
+  {
+    "text": "Customer never replied about the solar panels",
+    "reason": "abandoned"
+  },
+  {
+    "text": "Shopper left the boots in the cart and disappeared",
+    "reason": "abandoned"
+  },
+  {
+    "text": "The buyer abandoned the pump enquiry",
+    "reason": "abandoned"
+  },
+  {
+    "text": "No reply after we sent the tile details",
+    "reason": "abandoned"
+  },
+  {
+    "text": "The customer ghosted us after asking for more information",
+    "reason": "abandoned"
+  },
+  {
+    "text": "Rebar was added to a cart but checkout was never completed",
+    "reason": "abandoned"
+  },
+  {
+    "text": "The paint conversation stopped without a purchase",
+    "reason": "abandoned"
+  },
+  {
+    "text": "We followed up about the heater but heard nothing back",
+    "reason": "abandoned"
+  },
+  {
+    "text": "Customer left the chat before placing the order",
+    "reason": "abandoned"
+  },
+  {
+    "text": "The battery enquiry has had no response to follow ups",
+    "reason": "abandoned"
+  },
+  {
+    "text": "The shopper stopped responding and did not complete checkout",
+    "reason": "abandoned"
+  },
+  {
+    "text": "The wireless earbuds are sold out and the shelf is empty",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "We ran out of USB-C fast chargers before the shopper arrived",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "The requested running shoe size has zero units in inventory",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "Everyday backpacks are unavailable until our next restock",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "We normally sell insulated water bottles but have none left",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "Customer could not order the headphones because our stock was depleted",
+    "reason": "out_of_stock"
+  },
+  {
+    "text": "The wireless earbuds cost more than the customer can afford",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "The USB-C charger is too expensive; can you lower the price",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "My budget for running shoes is lower than your asking price",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "The backpack price is too high and I need a cheaper option",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "Customer asked for a discount on the insulated bottle",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "The total cost of the headphones is over my budget",
+    "reason": "price_too_high"
+  },
+  {
+    "text": "Do you carry wireless earbuds with active noise cancellation",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Looking for a charger brand that is missing from your catalogue",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Your shop does not sell the running shoe size I need",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Can you add a waterproof laptop backpack to your range",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "I searched for a thermal bottle that your store has never stocked",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "Customer wants a headphone model outside our current assortment",
+    "reason": "not_stocked"
+  },
+  {
+    "text": "The wireless earbud quotation was rejected in favour of another seller",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "Customer chose a competitor after receiving our charger quote",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "The buyer declined our shoe offer and purchased elsewhere",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "Our proposal for the backpack order was turned down",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "A rival supplier won the quote for insulated water bottles",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "Procurement did not accept the headphone quotation",
+    "reason": "quote_rejected"
+  },
+  {
+    "text": "The earbuds would arrive after the customer travels",
+    "reason": "lead_time"
+  },
+  {
+    "text": "I need a charger tomorrow but your shipping takes a week",
+    "reason": "lead_time"
+  },
+  {
+    "text": "The running shoes cannot be delivered before my race deadline",
+    "reason": "lead_time"
+  },
+  {
+    "text": "A week is too long to wait for this backpack",
+    "reason": "lead_time"
+  },
+  {
+    "text": "The insulated bottle shipment was delayed beyond our event date",
+    "reason": "lead_time"
+  },
+  {
+    "text": "Customer cancelled the headphones because delivery was too slow",
+    "reason": "lead_time"
+  },
+  {
+    "text": "Customer left wireless earbuds in the cart and never checked out",
+    "reason": "abandoned"
+  },
+  {
+    "text": "The charger enquiry went quiet after we sent product details",
+    "reason": "abandoned"
+  },
+  {
+    "text": "No reply to our follow-up about the running shoes",
+    "reason": "abandoned"
+  },
+  {
+    "text": "The shopper abandoned the backpack conversation without ordering",
+    "reason": "abandoned"
+  },
+  {
+    "text": "Customer stopped responding after asking about an insulated bottle",
+    "reason": "abandoned"
+  },
+  {
+    "text": "Headphones were added to the basket but the purchase was never completed",
+    "reason": "abandoned"
+  }
+]

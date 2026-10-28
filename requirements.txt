@@ -1,0 +1,3 @@
+flask>=3.0,<4
+scikit-learn>=1.5,<2
+anthropic>=0.40,<1   # optional: richer extraction when ANTHROPIC_API_KEY is set
