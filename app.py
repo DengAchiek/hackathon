@@ -14,7 +14,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import click
-from flask import Flask, Response, g, has_request_context, jsonify, render_template, request
+from flask import Flask, Response, g, has_request_context, jsonify, render_template, request, send_file
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from werkzeug.exceptions import HTTPException
 
@@ -419,6 +419,34 @@ def landing():
     return render_template("landing.html")
 
 
+@app.get("/present")
+def presentation():
+    from presentation_data import notebook_evaluation
+    return render_template("presentation.html", config=dict(
+        reasons={key: REASON_NAMES[key] for key in REASON_LABELS},
+        sources=SOURCE_NAMES, defaultCurrency=DEFAULT_CURRENCY,
+        today=datetime.now(BUSINESS_TIMEZONE).date().isoformat(),
+        evaluation=notebook_evaluation(ROOT),
+        notebookAvailable=(ROOT/'notebooks'/'GhostDemand_Training_Improved.ipynb').is_file(),
+    ))
+
+
+@app.get("/present/notebook")
+def presentation_notebook():
+    path = ROOT/'notebooks'/'GhostDemand_Training_Improved.ipynb'
+    if not path.is_file():
+        return jsonify(error="The training notebook is unavailable in this checkout."), 404
+    return send_file(path, as_attachment=True, download_name=path.name)
+
+
+@app.get("/present/notes")
+def presentation_notes():
+    path = ROOT/'PANEL_PRESENTATION.md'
+    if not path.is_file():
+        return jsonify(error="The presentation notes are unavailable in this checkout."), 404
+    return send_file(path, as_attachment=True, download_name='GhostDemand_Panel_Notes.md')
+
+
 @app.get("/dashboard")
 @app.get("/demo")
 def index():
@@ -663,12 +691,14 @@ def preview_import():
         raise ValueError("No customer enquiries were found in that file.")
     if len(items) > 100:
         raise ValueError("Import 1 to 100 requests at a time.")
-    for index, item in enumerate(items, 1):
+    # CSV row one is the header; report the row a person sees in their file.
+    first_row = 2 if (upload.filename or '').casefold().endswith('.csv') else 1
+    for index, item in enumerate(items, first_row):
         try:
             drafts.append(build_preview(item))
         except ValueError as exc:
             errors.append(dict(row=index, error=str(exc)))
-    return jsonify(drafts=drafts, errors=errors, total=len(items) + len(errors))
+    return jsonify(drafts=drafts, errors=errors, total=len(drafts) + len(errors))
 
 
 @app.get("/api/signals/export")
