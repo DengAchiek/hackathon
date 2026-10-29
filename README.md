@@ -8,6 +8,11 @@ The refined description, source-backed competitor analysis, implemented gaps,
 honest scope and three-minute presentation script are in [HACKATHON.md](HACKATHON.md).
 Recommended model upgrades, verified dataset sources and a training/evaluation
 plan are in [ML_ROADMAP.md](ML_ROADMAP.md).
+For hands-on learning, follow the [step-by-step ML workflow](ml_workflow/README.md):
+EDA, datasets, reproducible training, evaluation, optional transformer upgrades,
+deployment examples and monitoring. Its candidates stay separate from the live app.
+The real-business connection and reliability blueprint is in
+[BUSINESS_INTEGRATION.md](BUSINESS_INTEGRATION.md).
 
 ## Run locally
 
