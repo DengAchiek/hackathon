@@ -1,0 +1,10 @@
+.git
+.venv
+.venv-ml
+__pycache__
+**/__pycache__
+*.db
+*.db-*
+.env
+models
+ml_workflow/work

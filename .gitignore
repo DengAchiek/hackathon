@@ -1,4 +1,33 @@
-﻿node_modules/
+
+# Next.js
+node_modules/
 .next/
+out/
+
+# Environment variables and secrets
 .env
-.env.local
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+.venv-ml/
+venv/
+env/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Local databases
+*.db
+*.db-*
+
+# Machine learning artifacts and generated output
+models/
+ml_workflow/work/
+ghostdemand_training_output/
+
+# Build and tooling
+dist/
+build/

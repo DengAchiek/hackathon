@@ -1,36 +1,60 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GhostDemand AI
 
-## Getting Started
+**Demand beyond the sale.** A retail and e-commerce assistant that turns unsuccessful customer requests into evidence for what to stock, change and follow up on next.
 
-First, run the development server:
+## Project Components
+
+This repository contains the GhostDemand AI Flask application and a Next.js landing page.
+
+### 1. Flask application — backend and dashboard
+
+The Flask application provides the main GhostDemand AI workflow, including request capture, product and blocker extraction, an opportunity dashboard, follow-up management, CSV import/export, and machine-learning classification.
+
+To run the Flask application, follow the **Run locally** instructions below. By default, it runs at `http://127.0.0.1:5000`.
+
+### 2. Next.js landing page
+
+The Next.js frontend is located in `ghost-demand-ai-site/`. It provides the GhostDemand AI landing page and login-form interface.
+
+To run the Next.js project, open a terminal in the project folder:
 
 ```bash
+cd ghost-demand-ai-site
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Note:** The login forms are currently frontend interfaces. Real authentication requires backend integration.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Documentation
 
-## Learn More
+- [Hackathon overview](HACKATHON.md)
+- [Machine-learning roadmap](ML_ROADMAP.md)
+- [Step-by-step ML workflow](ml_workflow/README.md)
+- [Business integration plan](BUSINESS_INTEGRATION.md)
 
-To learn more about Next.js, take a look at the following resources:
+## Run the Flask Application Locally
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Python 3.10 or newer:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+python -m venv .venv
+```
 
-## Deploy on Vercel
+Activate the environment on Windows:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```powershell
+.venv\Scripts\Activate.ps1
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Install dependencies and start the application:
+
+```bash
+pip install -r requirements.txt
+flask --app app train-model
+python app.py
+```
+
+Open `http://127.0.0.1:5000` in your browser.
