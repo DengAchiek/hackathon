@@ -10,3 +10,8 @@ timeout = 120
 preload_app = True
 accesslog = '-'
 errorlog = '-'
+
+
+def when_ready(server):
+    from app import bootstrap_models
+    bootstrap_models()

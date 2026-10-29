@@ -14,7 +14,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import click
-from flask import Flask, Response, g, has_request_context, jsonify, render_template, request, send_file
+from flask import Flask, Response, g, has_request_context, jsonify, redirect, render_template, request, send_file
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from werkzeug.exceptions import HTTPException
 
@@ -421,14 +421,7 @@ def landing():
 
 @app.get("/present")
 def presentation():
-    from presentation_data import notebook_evaluation
-    return render_template("presentation.html", config=dict(
-        reasons={key: REASON_NAMES[key] for key in REASON_LABELS},
-        sources=SOURCE_NAMES, defaultCurrency=DEFAULT_CURRENCY,
-        today=datetime.now(BUSINESS_TIMEZONE).date().isoformat(),
-        evaluation=notebook_evaluation(ROOT),
-        notebookAvailable=(ROOT/'notebooks'/'GhostDemand_Training_Improved.ipynb').is_file(),
-    ))
+    return redirect('/demo#activity')
 
 
 @app.get("/present/notebook")
@@ -569,6 +562,14 @@ def get_follow_ups():
         owner=request.args.get("owner", "")[:100], urgency=request.args.get("urgency", "all"),
         due=request.args.get("due", "all"), query=request.args.get("q", "").strip()[:150],
         page=request.args.get("page", "1")))
+
+
+@app.get('/api/signals/<int:signal_id>')
+def get_signal(signal_id):
+    row = db().execute('SELECT * FROM signals WHERE id=?', (signal_id,)).fetchone()
+    if row is None:
+        return jsonify(error='Request not found.'), 404
+    return jsonify(enrich_signal(row))
 
 
 @app.get("/api/opportunities/evidence")
@@ -981,5 +982,19 @@ def train_model_command():
     click.echo(json.dumps(metadata, indent=2))
 
 
+def bootstrap_models():
+    """Initialize missing baseline artifacts only; never overwrite a saved model."""
+    if os.environ.get('GHOST_BOOTSTRAP_MODELS', '1') == '0':
+        return
+    for classifier in (ML, DEMO_ML):
+        if classifier.enabled and not classifier.path.exists():
+            classifier.train([])
+
+
+from intake import register_intake
+register_intake(app, db=db, save_signal=save_signal, is_demo=is_demo, default_currency=DEFAULT_CURRENCY)
+
+
 if __name__ == "__main__":
+    bootstrap_models()
     app.run(debug=os.environ.get("FLASK_DEBUG") == "1", port=int(os.environ.get("PORT", "5000")))
