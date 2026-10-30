@@ -14,7 +14,7 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import click
-from flask import Flask, Response, g, has_request_context, jsonify, redirect, render_template, request, send_file, session
+from flask import Flask, Response, g, has_request_context, jsonify, redirect, render_template, request, send_file, session, send_from_directory
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from werkzeug.exceptions import HTTPException
 from dotenv import load_dotenv
@@ -997,6 +997,27 @@ def bootstrap_models():
         if classifier.enabled and not classifier.path.exists():
             classifier.train([])
 
+
+from flask import send_from_directory, request, jsonify
+
+
+@app.route("/terms.html")
+def terms():   return send_from_directory("static", "terms.html")
+
+
+@app.route("/privacy.html")
+def privacy(): return send_from_directory("static", "privacy.html")
+
+
+@app.route("/consent.html")
+def consent(): return send_from_directory("static", "consent.html")
+
+
+@app.route("/api/consent", methods=["POST"])  # optional: store consent records for proof
+def record_consent():
+    data = request.get_json(silent=True) or {}
+    # TODO: save data + request.remote_addr + user agent to your DB
+    return jsonify(ok=True)
 
 from intake import register_intake
 receive_intake = register_intake(app, db=db, save_signal=save_signal, is_demo=is_demo, default_currency=DEFAULT_CURRENCY)
