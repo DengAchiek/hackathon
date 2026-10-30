@@ -1,4 +1,4 @@
-# GhostDemand: recommended models and training data
+# Mteja-Insight: recommended models and training data
 
 Prepared 27 October 2026. These are implementation recommendations for the retail
 and e-commerce app. The existing TF-IDF/logistic regression classifier remains
@@ -19,11 +19,11 @@ transformers for text classification with limited labeled data.
 [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 is an English sentence embedding checkpoint with 384-dimensional embeddings,
 suitable for semantic similarity and retrieval; its model card lists Apache-2.0.
-Neither is already trained on GhostDemand's blocker labels.
+Neither is already trained on Mteja-Insight's blocker labels.
 
 ## Models by operation
 
-| Operation | Algorithm / concrete model | How GhostDemand would use it | Training target and data |
+| Operation | Algorithm / concrete model | How Mteja-Insight would use it | Training target and data |
 | --- | --- | --- | --- |
 | Classify the blocker | Current: character TF-IDF + logistic regression. Next candidate: **SetFit + `sentence-transformers/all-MiniLM-L6-v2`**. | Return one of the app's six blocker labels and a score. Preserve low-score fallback and human review. | Verified request-to-reason pairs. Use retail support text as auxiliary data only after checking its actual meaning. |
 | Match product wording and find alternatives | **Sentence Transformer embeddings + cosine similarity**, using the same MiniLM checkpoint; compare against a simple lexical/alias baseline. | Retrieve candidate SKUs from the store catalog and show the best matches for review. Preserve brand, size and model constraints. | Query/product relevance pairs from ESCI plus reviewed pairs from the retailer's own catalog. |
@@ -57,7 +57,7 @@ in English, generated as a hybrid synthetic dataset. Fields include instruction,
 intent, category, tags and response. The declared license is **CDLA-Sharing-1.0**.
 Use instruction text and relevant intent annotations for a retail-language
 experiment. Availability and delivery intents need manual interpretation before
-mapping to GhostDemand's loss reasons: asking whether an item is available does
+mapping to Mteja-Insight's loss reasons: asking whether an item is available does
 not prove it was unavailable or that a sale was lost. Keep synthetic origin in
 the training manifest and preserve the source's license information.
 
@@ -86,7 +86,7 @@ cancellations, returns and missing values explicitly. This is historical
 completed-transaction data, not labeled failed enquiries or observed unmet
 demand; it cannot directly train the six blocker labels or a recovery model.
 
-### 4. GhostDemand's own reviewed requests — the essential target dataset
+### 4. Mteja-Insight's own reviewed requests — the essential target dataset
 
 The app already has a local synthetic starter set in `training_data.json` and a
 workflow for verified labels. The main dataset for the real product should come

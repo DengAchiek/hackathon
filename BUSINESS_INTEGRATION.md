@@ -1,4 +1,4 @@
-# Connecting GhostDemand to a real business
+# Connecting Mteja-Insight to a real business
 
 Implementation blueprint, 28 October 2026. This document describes the next
 integration work; it does not mean accounts have been connected or the local app
@@ -12,11 +12,11 @@ capture quality and reliability.
 ## The five-channel business in this discussion
 
 The assumed business uses **WhatsApp, email, a website chatbot, sales notes and
-voice notes**. Keep these tools in place and connect their events to GhostDemand.
+voice notes**. Keep these tools in place and connect their events to Mteja-Insight.
 
 | Channel | Connection approach | What staff experience |
 | --- | --- | --- |
-| WhatsApp | Authorized business messaging webhook, with message and conversation IDs. | Staff continue using the business inbox; relevant requests appear in GhostDemand. |
+| WhatsApp | Authorized business messaging webhook, with message and conversation IDs. | Staff continue using the business inbox; relevant requests appear in Mteja-Insight. |
 | Email | Authorized business-mailbox connector; fetch new messages and thread context. | Staff continue handling email normally; copied thread history is not counted as new demand. |
 | Website chatbot | A server-side conversation/event callback from the existing chatbot. | An unresolved conversation can become a request without retyping it. |
 | Sales notes | The existing mobile-friendly capture form, or a button in the business's current sales tool. | A salesperson records a short note and confirms the extracted details. |
@@ -164,7 +164,7 @@ Connect order/completion events from the store, POS or CRM. Match a later order
 to the relevant request using customer reference, product/variant and an agreed
 observation window. Ask for review when the match is ambiguous. Record the order
 ID and actual completed value, considering cancellations and returns. A later
-purchase should not automatically be credited to GhostDemand without evidence.
+purchase should not automatically be credited to Mteja-Insight without evidence.
 
 The current follow-up queue records outcomes manually. Automatic order matching
 is a proposed integration, not an existing connection. Model recovery training
