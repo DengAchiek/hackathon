@@ -1,5 +1,4 @@
 :root{--navy:#1b2150;--navy2:#2b3470;--ink:#141a3d;--muted:#5b6285;--line:#e4e7f1;--bg:#f6f7fb;--card:#fff;--accent:#4f46e5;--warn:#fdf3e7;--warn-ink:#7a4a12;color-scheme:light}
-@media (prefers-color-scheme:dark){:root{--ink:#e8eafc;--muted:#a3aad0;--line:#2a3160;--bg:#0f1330;--card:#161b42;--accent:#8b86ff;--warn:#2d2418;--warn-ink:#f0c88a;color-scheme:dark}}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:24px}
 body{margin:0;font:16px/1.65 Inter,"Segoe UI",system-ui,sans-serif;color:var(--ink);background:var(--bg);display:grid;grid-template-columns:260px 1fr;min-height:100vh}
 aside{background:var(--navy);color:#fff;padding:28px 20px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:28px}
