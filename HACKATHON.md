@@ -1,10 +1,10 @@
-# GhostDemand AI — demand beyond the sale
+#Mteja-Insight— demand beyond the sale
 
-**One-line pitch:** GhostDemand turns the requests retailers couldn't fulfil into evidence for what to stock, change, and follow up on next.
+**One-line pitch:** Mteja-Insight turns the requests retailers couldn't fulfil into evidence for what to stock, change, and follow up on next.
 
 ## Refined project description
 
-GhostDemand AI is a demand intelligence assistant for retailers and e-commerce
+Mteja-Insight is a demand intelligence assistant for retailers and e-commerce
 businesses. It captures unsuccessful customer requests from conversations, failed
 website searches, sales notes, unaccepted quotes, unavailable products, stockouts
 and abandoned enquiries. NLP extracts the requested product, quantity, stated
@@ -23,7 +23,7 @@ not an exhaustive feature audit. The opportunities below are our interpretation
 of how to package a focused retail workflow; they are not claims that no vendor
 could offer the same capabilities.
 
-| Existing capability | Evidence | GhostDemand's focused opportunity |
+| Existing capability | Evidence | Mteja-Insight's focused opportunity |
 | --- | --- | --- |
 | Support platforms classify intent, sentiment, language and entities and support routing/reporting. | [Zendesk intelligent triage](https://support.zendesk.com/hc/en-us/articles/4964463770650-About-intelligent-triage) | Put the requested product, commercial blocker and next retail action at the center of the workflow. NLP classification alone is not our novelty. |
 | Search analytics expose searches that return no results, including the filters involved. | [Algolia searches without results](https://support.algolia.com/hc/en-us/articles/13079831222033-Where-can-I-see-searches-without-results) | Combine zero-result evidence with conversations and sales notes; distinguish a missing product from a naming problem. |

@@ -1,6 +1,12 @@
-# GhostDemand — speaker notes
+<<<<<<< HEAD
+# Mteja Insights — speaker notes
 
 The application now presents a business workspace. Training, model scores and notebook experiments stay in backend documentation; `/present` redirects to `/demo#activity`.
+=======
+# Mteja-Insight — panel presentation guide
+
+**Pitch:** Mteja-Insight turns requests a retailer could not fulfil into evidence for what to stock, change and follow up on next.
+>>>>>>> 747530d (Business intergration,hackathon,ml-roadmap,panel presentation and readme)
 
 ## Three-minute operational story
 
@@ -10,7 +16,45 @@ The application now presents a business workspace. Training, model scores and no
 - **2:00–2:35:** Assign an owner, follow-up date and next action. Distinguish team-entered sample recoveries from verified orders and real revenue impact.
 - **2:35–3:00:** Explain the pilot: connect a retailer's channel relays, measure extraction quality and response time, then verify recoveries against actual orders.
 
+<<<<<<< HEAD
 Use the following material for technical questions, outside the business interface.
+=======
+### 0:00–0:25 · The problem
+
+“A sale tells a retailer what sold. It does not explain the customer who asked for a product that was unavailable, too expensive or too late. Mteja-Insight keeps that missed request and turns it into evidence the team can act on.”
+
+Click **Start the three-minute demo**. Say clearly that the requests and outcomes are synthetic. The stage illustration is an authored example; the following steps use the actual app APIs.
+
+### 0:25–1:00 · Capture
+
+“Here is a request for two earbuds that are sold out. The backend extracts a draft: product, quantity, budget and blocker. I can correct it before saving. The budget is an expression of interest; it is not revenue.”
+
+Click **Extract the demand signal**. Check product, quantity, budget, currency and blocker. Tick the review box, then **Save reviewed sample**. If repeating a rehearsal, the app reports an existing request instead of adding a duplicate. This does not overwrite its earlier review.
+
+### 1:00–1:25 · Evidence
+
+“The workspace groups related requests and preserves the original wording. We can see how many requests, known references and channel labels support this opportunity. Transparent business rules suggest a next step based on the recorded blockers.”
+
+Advance to **Evidence**. Point to the current counts, original messages and explanation. Known references are labels supplied with requests, not verified unique buyers. A channel label does not prove that a live provider account is connected. There are 24 starter requests across five products; subsequent counts reflect what has actually been saved in the demo.
+
+### 1:25–1:50 · Action
+
+“An insight is useful when someone owns the response. I assign this request to a team member with a date and an action. The workspace also records outcomes. Real recovered revenue needs an order link; this demo shows synthetic, team-entered amounts.”
+
+Advance to **Take action**. Save the follow-up and show the confirmation. This updates the demo record and queue. It does not send a customer message or place an order. The recovery figure comes from existing sample records; assigning this follow-up does not create revenue.
+
+### 1:50–2:35 · Machine learning
+
+“We convert the request text into TF-IDF features: weighted character fragments. A logistic regression classifier learns weights for six reasons a purchase failed. Its scores guide the blocker suggestion; a person reviews it. Product parsing and prioritisation use separate rules. The accompanying notebook achieved macro F1 of 0.860 on 21 synthetic test requests, but accepted none automatically at its selected threshold. This is a workflow experiment, not evidence of real-customer accuracy.”
+
+Advance to **The ML**. Point to the four-step diagram. The left card describes the baseline currently serving this demo; the right card describes a **separate notebook experiment**. Do not describe them as the same trained artifact. If the notebook changes and the evaluation snapshot no longer matches its hash, the score is hidden until it is reviewed again.
+
+### 2:35–3:00 · Pilot
+
+“Our next step is one retailer: connect the actual channels, label real unmet requests, and evaluate by channel, language and time. Then measure useful actions and order-verified recoveries. The contribution is the complete loop from missed request to evidence, ownership and learning.”
+
+Finish on **What’s next**. Open the retail workspace for questions, or download the notebook and these notes. No customer trial, commercial uplift or production connection is claimed.
+>>>>>>> 747530d (Business intergration,hackathon,ml-roadmap,panel presentation and readme)
 
 ## Understand the model before the panel
 
@@ -54,7 +98,7 @@ The feature extractor and classifier are both saved in the model artifact. Servi
 
 ### What do the notebook results mean?
 
-The accompanying `notebooks/GhostDemand_Training_Improved.ipynb` used **108 synthetic practice examples**, partitioned into **66 training, 21 validation and 21 test** examples. The splitter keeps provided message groups together. The starter set does not identify every paraphrase or template family; manually curate those groups before a stronger evaluation. Feature fitting uses training only; validation chooses settings; test measures the resulting candidate once.
+The accompanying `notebooks/Mteja-Insight_Training_Improved.ipynb` used **108 synthetic practice examples**, partitioned into **66 training, 21 validation and 21 test** examples. The splitter keeps provided message groups together. The starter set does not identify every paraphrase or template family; manually curate those groups before a stronger evaluation. Feature fitting uses training only; validation chooses settings; test measures the resulting candidate once.
 
 - Test **macro F1: 0.860**. F1 balances precision and recall; macro averaging gives each blocker equal weight.
 - Test **accuracy: 0.857** (18 of 21 classified correctly before abstention).
