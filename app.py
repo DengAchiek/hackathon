@@ -482,6 +482,7 @@ def add_bulk():
     return jsonify(signals), 201
 
 
+@app.route("/webhooks/whatsapp", methods=["GET", "POST"])
 @app.route("/webhook/whatsapp", methods=["GET", "POST"])
 def whatsapp():
     if request.method == "GET":
