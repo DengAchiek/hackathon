@@ -3,25 +3,17 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="GhostDemand turns missed customer requests into evidence for better stock, product and follow-up decisions.">
-<<<<<<< Updated upstream
 <title>Mteja-Insight · Demand beyond the sale</title>
-=======
-<title>Mteja Insight · Demand beyond the sale</title>
->>>>>>> Stashed changes
 <link rel="stylesheet" href="{{ url_for('static',filename='styles.css') }}">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <aside class="sidebar">
- <a class="brand" href="/" aria-label="GhostDemand home">
+ <a class="brand" href="/" aria-label="Mteja Insight home">
   <svg viewBox="0 0 40 44" aria-hidden="true">
     <path d="M5 37V19a15 15 0 0 1 30 0v18l-7-4-8 6-8-6z" fill="currentColor"/>
     <circle cx="15" cy="19" r="2" fill="#141b36"/><circle cx="25" cy="19" r="2" fill="#141b36"/></svg>
-<<<<<<< Updated upstream
     <span>Mteja-Insight<small>DEMAND BEYOND THE SALE</small></span></a>
-=======
-    <span>Mteja Insight<small>DEMAND BEYOND THE SALE</small></span></a>
->>>>>>> Stashed changes
  <div class="workspace"><span class="workspace-icon">R</span>
   <div>Retail workspace<small>{{ 'Demo · synthetic data' if demo else 'Local workspace' }}</small></div></div>
  <nav aria-label="Main navigation">
@@ -31,7 +23,7 @@
   <p>YOUR WORKSPACE</p>
   <a href="#followups" data-nav="followups"><span aria-hidden="true">↗</span>Follow-up queue</a>
   <a href="#catalog" data-nav="catalog"><span aria-hidden="true">▦</span>Product aliases</a>
-  <a href="#connections" data-nav="connections"><span aria-hidden="true">⌁</span>Channels & import</a>
+  <a href="#connections" data-nav="connections"><span aria-hidden="true">⌁</span>Connect channels</a>
   <a href="#capture" data-nav="capture"><span aria-hidden="true">＋</span>Add a note</a>
     <a href="#pesashield" data-nav="pesashield"><span aria-hidden="true">🛡</span>PesaShield AI</a>
  </nav>
@@ -362,12 +354,14 @@
   <div class="page-heading">
     <div>
       <p class="eyebrow">START SMALL. CAPTURE FROM ANYWHERE.</p>
-      <h1>Channels & import</h1>
-      <p class="lead">See which channels are sending enquiries. Use a CSV for historical requests.</p>
+      <h1>Connect your channels</h1>
+      <p class="lead">Bring WhatsApp and email enquiries into one workspace, then capture new requests automatically.</p>
     </div>
+    <button class="button primary" type="button" data-connect-channel="choose">＋ Connect a channel</button>
   </div>
-  <div class="channel-explainer"><h2>Connect once. Keep the requests.</h2><p>Your administrator connects each business channel to the intake service. After setup, new events are received, analysed and added to the workspace automatically. Voice channels supply transcripts.</p></div>
-  {% if demo %}<div class="card provider-notice"><h2>Ready for real messages?</h2><p>Connect WhatsApp Business and your Gmail demo label in the private live workspace. These sample records stay separate.</p><a class="button" href="/dashboard#connections">Open live channel setup →</a></div>{% else %}<div id="provider-connections" class="connection-grid"><div class="empty-card">Checking WhatsApp and Gmail…</div></div>{% endif %}
+  <div class="channel-explainer"><h2>Your enquiries, arriving automatically.</h2><p>Choose a channel below and complete its setup. Once verified, incoming enquiries appear in Channel activity and are analysed in the background. WhatsApp supports text messages; Gmail watches your selected label.</p></div>
+  {% if demo %}<div class="provider-demo-note"><b>Explore the setup.</b> You can view connection steps here. Real accounts are connected in the private live workspace, and demo requests stay separate.</div>{% endif %}
+  <div id="provider-connections" class="connection-grid"><div class="empty-card">Checking WhatsApp and Gmail…</div></div>
   <div class="connection-grid" id="channel-cards"><div class="empty-card">Checking channel activity…</div></div>
   <div class="card import-card">
     <div class="section-heading">
@@ -561,6 +555,7 @@
   </form>
 </dialog>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<dialog id="connection-dialog" class="connection-dialog" aria-labelledby="connection-title"><div class="section-heading"><div><p class="eyebrow">CHANNEL CONNECTION</p><h2 id="connection-title">Connect a channel</h2></div><button class="text-button" id="close-connection" type="button" aria-label="Close connection setup">✕</button></div><div id="connection-setup-content"></div></dialog>
 <script type="application/json" id="app-config">{{ config|tojson }}</script>
 <script src="{{ url_for('static',filename='app.js') }}" defer></script>
 

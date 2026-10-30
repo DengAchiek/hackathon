@@ -7,6 +7,7 @@ const money = totals => Object.entries(totals || {}).map(([currency,value]) => `
 const date = value => new Date(value).toLocaleDateString(undefined, {month:'short',day:'numeric'});
 const state = {page:'overview',filters:{q:'',days:'30',source:'',status:'',reason:'',review:''},signalPage:1,insights:null,signals:new Map(),draft:null,imports:[],requestVersion:0,signalRequestVersion:0,captureVersion:0,followupsVersion:0,intakeVersion:0,followups:{status:'active',q:'',owner:'',urgency:'all',due:'all',page:1}};
 let toastTimer, filterTimer, recognition;
+let providerState={providers:{}}, connectionSelection=null;
 
 function toast(message, error=false) {
   clearTimeout(toastTimer);
@@ -74,7 +75,7 @@ function route() {
     const selected=link.dataset.nav===state.page;link.classList.toggle('active',selected);
     if(selected)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');
   });
-  $('page-label').textContent={overview:'Opportunities',inbox:'Signal inbox',capture:'Add a note',followups:'Follow-up queue',catalog:'Product aliases',connections:'Channels & import',pesashield:'PesaShield AI',activity:'Channel activity'}[state.page];
+  $('page-label').textContent={overview:'Opportunities',inbox:'Signal inbox',capture:'Add a note',followups:'Follow-up queue',catalog:'Product aliases',connections:'Connect channels',pesashield:'PesaShield AI',activity:'Channel activity'}[state.page];
   window.scrollTo(0,0);
   if(state.page==='inbox')loadSignals().catch(showError);
   if(state.page==='catalog')loadCatalog().catch(showError);
@@ -366,17 +367,54 @@ async function loadIntake() {
     const label=attention?'Needs attention':channel.events?'Events received':cfg.demo?'No sample traffic':connected||data.relay_configured?'Waiting for first event':provider?.configured?'Finish connecting':'Setup needed';
     return `<article class="card channel-card"><div class="channel-card-top"><span class="channel-avatar">${esc(channel.name.slice(0,2).toUpperCase())}</span><span class="tag ${attention?'amber':channel.events||connected?'green':''}">${label}</span></div><h2>${esc(channel.name)}</h2><p>${esc(channel.description)}</p><div class="channel-card-bottom"><b>${number(channel.events)} ${channel.events===1?'event':'events'}</b><small>${esc(timeLabel(channel.last_event_at))}</small></div></article>`;
   }).join('');
-  if(connections)renderProviders(connections);
+  renderProviders(connections||{demo:true,providers:{}});
+}
+function providerLabel(provider,channel){
+  if(cfg.demo)return 'Demo · not connected';
+  if(channel==='whatsapp')return provider.state==='receiving'?'Messages received':provider.state==='verified'?'Webhook verified':provider.configured?'Finish verification':'Not connected';
+  return provider.state==='listening'?'Listening':provider.state==='attention'?'Needs attention':provider.configured?'Ready to connect':'Not connected';
 }
 function renderProviders(data){
-  if(cfg.demo||!$('provider-connections'))return;
-  const wa=data.providers.whatsapp, gmail=data.providers.gmail;
-  $('provider-connections').innerHTML=`<article class="card provider-card"><div class="card-kicker">WHATSAPP BUSINESS · META CLOUD API</div><h2>Receive real WhatsApp enquiries</h2><span class="tag ${wa.state==='receiving'?'green':wa.state==='verified'?'blue':'amber'}">${wa.state==='receiving'?'Messages received':wa.state==='verified'?'Webhook verified':wa.configured?'Waiting for verification':'Setup needed'}</span><p>Incoming text messages are captured and analysed automatically. Replies and media downloads are not enabled.</p>${wa.callback_url?`<label>Callback URL</label><code class="callback-url">${esc(wa.callback_url)}</code>`:'<p class="footnote">Set the public HTTPS address on the server to show the callback URL.</p>'}<p class="footnote">${wa.last_message_at?'Last message: '+esc(timeLabel(wa.last_message_at)):wa.verified_at?'Verified: '+esc(timeLabel(wa.verified_at)):'Your administrator configures the Meta app secret, phone number ID and verification token on the server.'}</p></article><article class="card provider-card"><div class="card-kicker">GMAIL · READ-ONLY DEMO LABEL</div><h2>Receive real email enquiries</h2><span class="tag ${gmail.state==='listening'?'green':'amber'}">${gmail.state==='listening'?'Listening':gmail.state==='attention'?'Needs attention':gmail.configured?'Ready to connect':'Setup needed'}</span><p>${esc(gmail.message||'Start the listener to receive new enquiries.')}</p><div class="provider-detail"><span>Watched label</span><b>${esc(gmail.label)}</b></div><p class="footnote">${gmail.last_success_at?'Last successful check: '+esc(timeLabel(gmail.last_success_at)):'Existing mailbox messages are not imported when the label is first connected.'}</p><button class="button small" id="check-new-email" ${gmail.configured?'':'disabled'}>Check new email</button></article>`;
-  if($('check-new-email'))$('check-new-email').onclick=()=>busy($('check-new-email'),'Checking…',async()=>{
-    try{const result=await api('/api/connections/gmail/check',{method:'POST',body:'{}'});await Promise.all([loadIntake(),refresh()]);toast(result.state==='busy'?'The Gmail listener is already checking for new enquiries.':result.baseline?'Gmail is listening. Send a new demo enquiry now.':`${result.imported||0} new emails processed.`);}
-    catch(error){toast(error.message,true);loadIntake().catch(()=>{});}
-  });
+  providerState=data;
+  if(!$('provider-connections'))return;
+  const wa=data.providers.whatsapp||{}, gmail=data.providers.gmail||{};
+  $('provider-connections').innerHTML=`<article class="card provider-card"><div class="provider-card-top"><span class="provider-icon whatsapp" aria-hidden="true">W</span><span class="tag ${['receiving','verified'].includes(wa.state)?'green':''}">${esc(providerLabel(wa,'whatsapp'))}</span></div><div class="card-kicker">WHATSAPP BUSINESS</div><h2>Connect your business number</h2><p>Bring incoming WhatsApp text enquiries straight into your workspace. Complete verification once, then receive new requests automatically.</p><p class="footnote">${wa.last_message_at?'Last message: '+esc(timeLabel(wa.last_message_at)):wa.verified_at?'Verified: '+esc(timeLabel(wa.verified_at)):'Use a Meta WhatsApp Cloud API account.'}</p><button class="button ${['receiving','verified'].includes(wa.state)?'':'primary'}" type="button" data-connect-channel="whatsapp">${['receiving','verified'].includes(wa.state)?'Manage WhatsApp':'Connect WhatsApp'} →</button></article><article class="card provider-card"><div class="provider-card-top"><span class="provider-icon gmail" aria-hidden="true">G</span><span class="tag ${gmail.state==='listening'?'green':gmail.state==='attention'?'amber':''}">${esc(providerLabel(gmail,'gmail'))}</span></div><div class="card-kicker">GMAIL</div><h2>Connect your enquiry mailbox</h2><p>Receive new customer enquiries from one Gmail label. The connection is read-only and leaves your messages unread.</p><div class="provider-detail"><span>Enquiry label</span><b>${esc(gmail.label||'GhostDemandDemo')}</b></div><p class="footnote">${gmail.last_success_at?'Last successful check: '+esc(timeLabel(gmail.last_success_at)):'Existing messages are skipped when the label is first connected.'}</p><button class="button ${gmail.state==='listening'?'':'primary'}" type="button" data-connect-channel="gmail">${gmail.state==='listening'?'Manage Gmail':'Connect Gmail'} →</button></article>`;
 }
+function connectionStep(number,title,body,done=false){return `<li class="connection-step ${done?'complete':''}"><span>${done?'✓':number}</span><div><h3>${title}</h3>${body}</div></li>`;}
+function openConnectionSetup(channel){
+  connectionSelection=channel;
+  const content=$('connection-setup-content'), data=providerState;
+  const guide='https://github.com/DengAchiek/hackathon/blob/main/LIVE_DEMO_SETUP.md';
+  if(channel==='choose'){
+    $('connection-title').textContent='Choose a channel';
+    content.innerHTML=`<p class="connection-intro">Connect the places your customers already use. Select a channel to see its setup steps and current status.</p><div class="connection-choices"><button type="button" class="connection-choice" data-connect-channel="whatsapp"><b>WhatsApp Business →</b><span>Connect a Meta Cloud API business number.</span></button><button type="button" class="connection-choice" data-connect-channel="gmail"><b>Gmail →</b><span>Watch a dedicated customer-enquiry label.</span></button></div>`;
+  }else{
+    const provider=data.providers[channel]||{}, isMail=channel==='gmail';
+    $('connection-title').textContent=isMail?'Connect Gmail':'Connect WhatsApp';
+    const setupNotice=cfg.demo?'<div class="connection-notice">You are exploring a demo. Complete account setup in your private live workspace.</div>':!data.private_workspace?'<div class="connection-notice">Workspace-owner setup is required before real messages can be received. Keep account credentials in private server settings.</div>':'';
+    const access=connectionStep(1,'Prepare your account',isMail?`<p>Create the Gmail label <b>${esc(provider.label||'GhostDemandDemo')}</b> and apply it to new customer enquiries with a Gmail filter. Use an app password from a Google account with 2-Step Verification.</p><a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer">Open Google app-password settings ↗</a>`:'<p>Use the Meta app connected to your WhatsApp Business Cloud API number. The regular WhatsApp Business phone app alone cannot supply this connection.</p><a href="https://developers.facebook.com/apps/" target="_blank" rel="noopener noreferrer">Open Meta app settings ↗</a>',provider.configured);
+    const credentials=connectionStep(2,'Complete secure workspace setup',isMail?'<p>The workspace owner adds the Gmail address and app password to private server settings. The enquiry label must be available through IMAP. Account secrets never appear on this page.</p>':'<p>The workspace owner adds the Meta app secret, business phone-number ID and verification token to private server settings. Account secrets never appear on this page.</p>',provider.configured);
+    const finish=connectionStep(3,isMail?'Connect and send a new enquiry':'Verify your WhatsApp callback',isMail?'<p>Once setup is ready, use Check connection below. Wait for Listening, then send a new email into the watched label. Older messages are not imported.</p>':`${provider.callback_url?`<p>In Meta, use this callback URL and your private verification token, then subscribe to messages.</p><code class="callback-url">${esc(provider.callback_url)}</code><button class="text-button connection-copy" type="button" id="copy-callback">Copy callback URL</button>`:'<p>Set the public HTTPS address in private server settings. Your exact WhatsApp callback URL will then appear here.</p>'}<p>Send a text enquiry from an allowed sender and check Channel activity.</p>`,isMail?provider.state==='listening':['verified','receiving'].includes(provider.state));
+    content.innerHTML=`<div class="connection-state"><span class="tag ${['listening','verified','receiving'].includes(provider.state)?'green':''}">${esc(providerLabel(provider,channel))}</span><button class="text-button" type="button" data-connect-channel="choose">Choose another channel</button></div>${setupNotice}<ol class="connection-steps">${access}${credentials}${finish}</ol><div class="connection-dialog-actions">${cfg.demo?'<a class="button primary" href="/dashboard#connections">Open private live workspace →</a>':`<button class="button primary" id="check-channel-connection" type="button">${isMail&&provider.configured&&provider.state!=='listening'?'Connect Gmail':'Check connection'}</button>`}<a class="button" href="${guide}" target="_blank" rel="noopener noreferrer">Full setup guide ↗</a><a class="text-button" href="#activity" id="view-connection-activity">View channel activity →</a></div><p class="footnote">Connection status changes only after a successful provider check. Setup instructions do not connect an account by themselves.</p>`;
+    if($('copy-callback'))$('copy-callback').onclick=async()=>{try{await navigator.clipboard.writeText(provider.callback_url);toast('Callback URL copied.');}catch{toast('Select the callback URL above and copy it.',true);}};
+    if($('check-channel-connection'))$('check-channel-connection').onclick=()=>busy($('check-channel-connection'),'Checking…',async()=>{
+      try{
+        let result;
+        if(isMail&&provider.configured)result=await api('/api/connections/gmail/check',{method:'POST',body:'{}'});
+        await loadIntake();if($('connection-dialog').open&&connectionSelection===channel)openConnectionSetup(channel);
+        const updated=providerState.providers[channel]||{};
+        toast(result?.baseline?'Gmail is listening. Send a new enquiry now.':result?.state==='busy'?'The Gmail listener is already checking the label.':updated.state==='listening'?'Gmail is listening for new enquiries.':['verified','receiving'].includes(updated.state)?'WhatsApp verification is complete.':updated.configured?'Finish provider verification, then check again.':'Complete the private workspace settings in the setup guide, then check again.');
+      }catch(error){toast(error.message,true);}
+    });
+    $('view-connection-activity').onclick=()=>{$('connection-dialog').close();};
+  }
+  if(!$('connection-dialog').open)$('connection-dialog').showModal();
+}
+$('close-connection').onclick=()=>{$('connection-dialog').close();connectionSelection=null;};
+document.addEventListener('click',event=>{
+  const button=event.target.closest('[data-connect-channel]');
+  if(button)openConnectionSetup(button.dataset.connectChannel);
+});
 document.addEventListener('click',async event=>{
   const button=event.target.closest('button');if(!button)return;
   if(button.dataset.intake){

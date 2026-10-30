@@ -37,7 +37,7 @@ Restart the app after changing configuration. In particular, do not import real 
 2. In Gmail settings, create a filter for a distinctive subject such as **`[GhostDemand Demo]`**, and apply the `GhostDemandDemo` label to matching incoming messages. Do not apply it to all existing conversations.
 3. Ensure the label is visible to IMAP clients in Gmail's label settings, where that control is available. Personal Gmail IMAP access is already enabled; you do not need to find an old “Enable IMAP” switch. [Google's current Gmail client guidance](https://support.google.com/mail/answer/7126229?hl=en).
 4. With 2-Step Verification enabled, create an app password in your Google account and place it only in the server's private configuration. Google recommends OAuth for longer-term applications; this single-account demo uses the app-password option you confirmed is available. [Google app-password instructions and restrictions](https://support.google.com/accounts/answer/185833?hl=en).
-5. Start the updated server and sign in at `/login` with the workspace password. Open **Channels & import**. Wait until Gmail shows **Listening**, or click **Check new email**.
+5. Start the updated server and sign in at `/login` with the workspace password. Open **Connect channels**, select **Connect Gmail**, and use **Check connection** after the private settings are ready. Wait until Gmail shows **Listening**.
 
 On the first successful connection, the listener records the label's current UID position and imports **no existing messages**. Send your test enquiry only after it says Listening. It checks approximately every 15 seconds; the dashboard refreshes every eight seconds. Allow around 25 seconds for a stage demonstration under normal network conditions. This timing is a configured polling interval, not a delivery guarantee.
 
@@ -56,7 +56,7 @@ My total budget is KES 6,000 and I need them today.
 
 This adapter targets **Meta's Cloud API**, not the regular WhatsApp Business phone app or a provider-specific alternative. If your existing API is hosted by a business solution provider, confirm its webhook format before replacing any provider configuration.
 
-1. Deploy this source to your existing HTTPS web service and set the private variables above. Open the live workspace's **Channels & import** page to see the exact callback URL:
+1. Deploy this source to your existing HTTPS web service and set the private variables above. Open **Connect channels**, select **Connect WhatsApp**, and use the guided steps to see the exact callback URL:
 
    ```text
    https://YOUR-ACTUAL-APP-HOST/webhooks/whatsapp
