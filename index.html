@@ -563,5 +563,10 @@
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <script type="application/json" id="app-config">{{ config|tojson }}</script>
 <script src="{{ url_for('static',filename='app.js') }}" defer></script>
+
+<!-- Paste before </body> in index.html, landing.html and login.html -->
+<div style="height:64px"></div><!-- spacer so the fixed footer never covers content -->
+<footer style="position:fixed;left:0;right:0;bottom:0;z-index:999;padding:14px 24px;font:700 14px Inter,system-ui,sans-serif;color:#4f46e5;background:#f6f7fb;border-top:1px solid #e4e7f1;display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:center;align-items:center;text-align:center">
+<span>© 2026 Mteja Insights</span><a href="/terms.html" style="color:#4f46e5;font-weight:700;text-decoration:none">Terms of service</a><a href="/privacy.html" style="color:#4f46e5;font-weight:700;text-decoration:none">Privacy policy</a><a href="/consent.html" style="color:#4f46e5;font-weight:700;text-decoration:none">Consent form</a><a href="mailto:mtejainsights@gmail.com" style="color:#4f46e5;font-weight:700;text-decoration:none">mtejainsights@gmail.com</a></footer>
 </body>
 </html>
