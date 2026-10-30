@@ -11,42 +11,7 @@ from flask import Flask, jsonify, request
 
 from demand_ml import ReasonClassifier
 from .matching import CatalogMatcher
-
-
-class SetFitReason:
-    def __init__(self, config):
-        import numpy as np
-        from setfit import SetFitModel
-        self.np = np
-        # Only load your own trusted local artifact: SetFit's sklearn head can use pickle.
-        self.model = SetFitModel.from_pretrained(config["path"], local_files_only=True)
-        self.labels = config["labels"]
-        self.threshold, self.version = config["threshold"], config["version"]
-        self.config = config
-
-    def status(self):
-        return dict(ready=True, enabled=True, threshold=self.threshold, error=None,
-                    algorithm="SetFit + MiniLM", metadata=self.config.get("metadata", {"version": self.version}))
-
-    def predict(self, text):
-        scores = self.np.asarray(self.model.predict_proba([text], as_numpy=True))[0]
-        index = int(scores.argmax())
-        return dict(reason=self.labels[index], confidence=round(float(scores[index]), 4),
-                    used=bool(scores[index] >= self.threshold), model_version=self.version)
-
-
-def load_reason_model(reason_config):
-    config = json.loads(Path(reason_config).read_text())
-    if not Path(config["path"]).is_absolute():
-        config["path"] = str((Path(reason_config).resolve().parent/config["path"]).resolve())
-    if config["kind"] == "tfidf":
-        model = ReasonClassifier(config["path"], threshold=config["threshold"])
-        if not model.status()["ready"]:
-            raise ValueError("Reason artifact is missing or invalid.")
-        return model
-    if config["kind"] == "setfit":
-        return SetFitReason(config)
-    raise ValueError("Unknown reason model kind.")
+from reason_backends import SetFitReason, load_reason_model
 
 
 def create_app(reason_config=None, matching_index=None):

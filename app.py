@@ -20,6 +20,7 @@ from werkzeug.exceptions import HTTPException
 from dotenv import load_dotenv
 
 from demand_ml import REASON_LABELS, ReasonClassifier, TrainingError
+from reason_backends import configured_reason_model
 from fraud_ml import SCAM_LABELS, ScamClassifier, TrainingError as FraudTrainingError, STARTER_PATH as FRAUD_STARTER_PATH
 from intelligence import (
     CURRENCIES, KINDS, REASON_NAMES, SOURCE_NAMES, STATUSES, attach_groups, detect_currency,
@@ -43,12 +44,14 @@ DEFAULT_CURRENCY = os.environ.get("GHOST_CURRENCY", "KES")
 BUSINESS_TIMEZONE = ZoneInfo(os.environ.get("GHOST_TIMEZONE", "Africa/Nairobi"))
 if DEFAULT_CURRENCY not in CURRENCIES:
     raise ValueError("GHOST_CURRENCY must be one of " + ", ".join(CURRENCIES))
-ML = ReasonClassifier(
+ML = configured_reason_model(
     os.environ.get("GHOST_ML_PATH", str(ROOT / "models" / "reason_classifier.json")),
+    config_path=os.environ.get("GHOST_REASON_CONFIG"),
     enabled=os.environ.get("GHOST_ML_ENABLED", "1").lower() not in ("0", "false", "no"),
     threshold=float(os.environ.get("GHOST_ML_THRESHOLD", "0.55")),
 )
-DEMO_ML = ReasonClassifier(ROOT / "models" / "demo_reason_classifier.json")
+DEMO_ML = configured_reason_model(ROOT / "models" / "demo_reason_classifier.json",
+                                  config_path=os.environ.get("GHOST_DEMO_REASON_CONFIG"))
 FRAUD_ML = ScamClassifier(
     os.environ.get("GHOST_FRAUD_ML_PATH", str(ROOT / "models" / "scam_classifier.json")),
     enabled=os.environ.get("GHOST_FRAUD_ML_ENABLED", "1").lower() not in ("0", "false", "no"),
@@ -1061,7 +1064,7 @@ def bootstrap_models():
     if os.environ.get('GHOST_BOOTSTRAP_MODELS', '1') == '0':
         return
     for classifier in (ML, DEMO_ML):
-        if classifier.enabled and not classifier.path.exists():
+        if isinstance(classifier, ReasonClassifier) and classifier.enabled and not classifier.path.exists():
             classifier.train([])
 
 

@@ -186,3 +186,5 @@ def analyse_message(text, *, prediction=None, expected=None):
                 guidance_url=GUIDANCE_URL, analysis_version=ANALYSIS_VERSION,
                 reason_engine='rules+local_ml' if any(item['code'] == 'model_caution' for item in flags) else 'rules',
                 risk_score=None, confidence=None)
+
+
