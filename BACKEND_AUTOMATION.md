@@ -20,7 +20,13 @@ Incoming events are analysed on the server during the receiver request. No previ
 
 This implementation processes events inline, rather than claiming a hosted background queue. Each valid event is recorded before analysis. Successful signal creation and its intake result commit together. A processing failure is retained as **Needs retry** and returns HTTP 503. The relay should retry the same event ID with backoff. The application also provides a retry action in Channel activity.
 
-## Configure a real business channel
+## Direct WhatsApp and Gmail connections
+
+Meta Cloud API text webhooks and a read-only Gmail label listener are implemented in `live_channels.py`. Both pass messages through the same automatic intake functions below. Configure them using [LIVE_DEMO_SETUP.md](LIVE_DEMO_SETUP.md); the live workspace requires its server-side password and signing key before private channel messages are accepted. No account is connected until its private settings and provider setup are complete.
+
+`GET /webhooks/whatsapp` handles Meta's verification challenge; `POST` on the same path checks the raw-body HMAC signature and selected phone-number ID. The Gmail listener selects only the configured demo label, starts after its existing mail, and polls for new messages without changing read state. Incoming text is analysed locally. These connectors do not send replies, download media or transcribe voice notes.
+
+## Configure another business channel or relay
 
 1. Set a strong random `GHOST_INGEST_TOKEN` in the server environment, including the Render service's Environment settings. Keep it in the business relay's secret store too. Do not place it in browser JavaScript or a public chatbot widget.
 2. Configure the channel's existing backend or automation to forward an event to `POST /api/ingest/<channel>` with `Authorization: Bearer <token>` and JSON content type. Verify the original provider's webhook signature in that relay before forwarding it.
@@ -29,8 +35,8 @@ This implementation processes events inline, rather than claiming a hosted backg
 
 | Channel path | Input | Real integration needed |
 | --- | --- | --- |
-| `whatsapp` | Message/conversation text | Your messaging provider's server-side forwarding |
-| `email` | Extracted enquiry/conversation text | Your business email forwarding or automation |
+| `whatsapp` | Message/conversation text | An alternative to the direct Meta adapter: your provider's server-side forwarding |
+| `email` | Extracted enquiry/conversation text | An alternative to the Gmail listener: business email forwarding or automation |
 | `chatbot` | Text and available conversation outcome | A server-side chatbot event handler |
 | `sales_notes` | Saved sales-note text | Your sales system's saved-note callback |
 | `voice_notes` | Completed `transcript` | Your voice service's transcription callback |
@@ -39,7 +45,7 @@ This implementation processes events inline, rather than claiming a hosted backg
 | `rejected_quote` | Text | An explicit rejected-quotation event |
 | `abandoned_enquiry` | Text | An established abandoned-enquiry event |
 
-The app cannot read a person's WhatsApp or email just because a label appears in the interface. This update does not connect accounts, fetch private inboxes, download audio or implement speech recognition. The authenticated receiver is provider-neutral; each real channel still needs its forwarding setup. Existing manual/prototype APIs remain available and are distinct from the authenticated relay contract.
+The app cannot read a person's WhatsApp or email just because a channel name appears in the interface. The direct adapters above require private account configuration; other channels still need a forwarding setup. The authenticated relay receiver is provider-neutral. Existing manual/prototype APIs remain distinct from this relay contract and are protected by the live workspace login when real integrations are enabled.
 
 ### Example event
 
@@ -87,4 +93,4 @@ Training, evaluation, language coverage, model versioning and deployment compari
 
 Open `/demo#activity` and select **Send sample channel events**. Five fixed synthetic events pass through the same normalization, eligibility and analysis functions used by the live receiver. Four create demand signals; one availability question needs context. Repeating the sample reuses event IDs. The live database and real accounts are untouched.
 
-For a real integration test, use a separate database and test relay token. The app remains a single-workspace hackathon prototype: business-user authentication, tenant isolation, verified order links and durable hosted storage are separate deployment requirements. On a service without persistent storage, SQLite records and generated artifacts do not survive replacement of the runtime filesystem. Do not describe the current demo as a production multi-tenant service.
+For a real integration test, use a separate database and test account or relay token. The app includes a single-workspace owner login and remains a hackathon prototype. Multi-user identity, tenant isolation, verified order links and durable hosted storage need further deployment work. On a service without persistent storage, SQLite records, mailbox cursors and generated artifacts do not survive replacement of the runtime filesystem. Do not describe the demo as a production multi-tenant service.

@@ -72,6 +72,7 @@ class AutomaticIntakeTests(unittest.TestCase):
         self.assertEqual(row['source'], 'email')
         self.assertEqual(row['reason'], 'lead_time')
         self.assertEqual(row['reason_engine'], 'local_ml')
+        ghost.llm_extract.assert_not_called()
         self.assertIsNone(row['reviewed_reason'])
         self.assertTrue(row['needs_review'])
         activity = self.activity()

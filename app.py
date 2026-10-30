@@ -14,9 +14,10 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 import click
-from flask import Flask, Response, g, has_request_context, jsonify, redirect, render_template, request, send_file
+from flask import Flask, Response, g, has_request_context, jsonify, redirect, render_template, request, send_file, session
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 from werkzeug.exceptions import HTTPException
+from dotenv import load_dotenv
 
 from demand_ml import REASON_LABELS, ReasonClassifier, TrainingError
 from fraud_ml import SCAM_LABELS, ScamClassifier, TrainingError as FraudTrainingError, STARTER_PATH as FRAUD_STARTER_PATH
@@ -27,12 +28,17 @@ from intelligence import (
 )
 
 ROOT = Path(__file__).resolve().parent
+if os.environ.get('GHOST_LOAD_ENV', '1') != '0':
+    load_dotenv(ROOT / '.env', override=False)
 app = Flask(__name__, template_folder=str(ROOT))
 app.config["MAX_CONTENT_LENGTH"] = 1024 * 1024
 app.secret_key = os.environ.get("GHOST_SECRET_KEY") or secrets.token_hex(32)
 preview_signer = URLSafeTimedSerializer(app.secret_key, salt="ghost-preview-v1")
 DB = os.environ.get("GHOST_DB", str(ROOT / "ghostdemand.db"))
 DEMO_DB = os.environ.get("GHOST_DEMO_DB", str(ROOT / "ghostdemand-demo.db"))
+from workspace_auth import integrations_requested
+if integrations_requested() and Path(DB).resolve() == Path(DEMO_DB).resolve():
+    raise ValueError('Live integrations require separate live and demo databases.')
 DEFAULT_CURRENCY = os.environ.get("GHOST_CURRENCY", "KES")
 BUSINESS_TIMEZONE = ZoneInfo(os.environ.get("GHOST_TIMEZONE", "Africa/Nairobi"))
 if DEFAULT_CURRENCY not in CURRENCIES:
@@ -224,7 +230,7 @@ def validated_fields(candidate):
 
 def extract(text, source):
     base = rule_extract(text, source)
-    richer = validated_fields((llm_extract(text, source) if not is_demo() else None) or {})
+    richer = validated_fields((llm_extract(text, source) if not is_demo() and not g.get('local_extraction_only') else None) or {})
     base.update(richer)
     base["reason_engine"] = "claude" if "reason" in richer else "rules"
     prediction = active_model().predict(text)
@@ -445,7 +451,8 @@ def presentation_notes():
 def index():
     return render_template("index.html", demo=request.path == "/demo", config=dict(
         sources=SOURCE_NAMES, reasons=REASON_NAMES, statuses=STATUSES, currencies=CURRENCIES,
-        kinds=KINDS, defaultCurrency=DEFAULT_CURRENCY, demo=request.path == "/demo"))
+        kinds=KINDS, defaultCurrency=DEFAULT_CURRENCY, demo=request.path == "/demo",
+        csrf=session.get('csrf', '')))
 
 
 @app.post("/api/signals")
@@ -992,9 +999,14 @@ def bootstrap_models():
 
 
 from intake import register_intake
-register_intake(app, db=db, save_signal=save_signal, is_demo=is_demo, default_currency=DEFAULT_CURRENCY)
+receive_intake = register_intake(app, db=db, save_signal=save_signal, is_demo=is_demo, default_currency=DEFAULT_CURRENCY)
+from workspace_auth import register_workspace_auth
+register_workspace_auth(app, is_demo)
+from live_channels import register_live_channels
+start_channel_listeners = register_live_channels(app, db=db, receive=receive_intake, is_demo=is_demo)
 
 
 if __name__ == "__main__":
     bootstrap_models()
+    start_channel_listeners()
     app.run(debug=os.environ.get("FLASK_DEBUG") == "1", port=int(os.environ.get("PORT", "5000")))

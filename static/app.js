@@ -18,10 +18,14 @@ function toast(message, error=false) {
 async function api(path, options={}) {
   const headers = {...(cfg.demo ? {'X-Ghost-Demo':'1'} : {}),...options.headers};
   if (!(options.body instanceof FormData)) headers['Content-Type'] = 'application/json';
+  if(cfg.csrf)headers['X-Ghost-CSRF']=cfg.csrf;
   const response = await fetch(path, {...options, headers});
   let payload;
   try { payload = await response.json(); } catch { throw new Error('The server returned an unexpected response. Please try again.'); }
-  if (!response.ok) throw new Error(payload.error || 'The request failed. Please try again.');
+  if (!response.ok) {
+    if(response.status===401&&payload.login_required)location.assign('/login?next='+encodeURIComponent(location.pathname+location.hash));
+    throw new Error(payload.error || 'The request failed. Please try again.');
+  }
   return payload;
 }
 async function busy(button, label, action) {
@@ -344,15 +348,33 @@ function timeLabel(value) {
 }
 async function loadIntake() {
   const revision=++state.intakeVersion;
-  const data=await api('/api/intake');
+  const [data,connections]=await Promise.all([api('/api/intake'),cfg.demo?Promise.resolve(null):api('/api/connections')]);
   if(revision!==state.intakeVersion)return;
   const k=data.summary;
-  $('automatic-status').textContent=cfg.demo?'Automatic capture · sample workspace':data.relay_configured?'Automatic intake ready':'Automatic capture needs setup';
-  $('automatic-detail').textContent=k.total?`${k.captured} captured · ${k.needs_context} awaiting context · updated ${new Date().toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}`:cfg.demo?'Send sample channel events to see requests processed automatically.':'Connect your business channels to start receiving enquiries.';
-  document.querySelector('.automatic-indicator').classList.toggle('ready',cfg.demo||data.relay_configured);
-  $('intake-metrics').innerHTML=`<div class="metric"><span>Incoming events</span><b>${number(k.total)}</b><small>Received from channel relays</small></div><div class="metric"><span>Demand captured</span><b>${number(k.captured)}</b><small>Analysed and added automatically</small></div><div class="metric"><span>Needs context</span><b>${number(k.needs_context)}</b><small>Outcome still to confirm</small></div><div class="metric"><span>Needs retry</span><b>${number(k.failed)}</b><small>Retained so processing can be retried</small></div>`;
+  const providers=connections?.providers||{};
+  const ready=data.relay_configured||providers.gmail?.state==='listening'||['verified','receiving'].includes(providers.whatsapp?.state);
+  $('automatic-status').textContent=cfg.demo?'Automatic capture · sample workspace':ready?'Automatic intake ready':'Automatic capture needs setup';
+  $('automatic-detail').textContent=k.total?`${k.captured} captured · ${k.needs_context} awaiting context · updated ${new Date().toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}`:cfg.demo?'Send sample channel events to see requests processed automatically.':ready?'Waiting for your first incoming enquiry.':'Connect your business channels to start receiving enquiries.';
+  document.querySelector('.automatic-indicator').classList.toggle('ready',cfg.demo||ready);
+  $('intake-metrics').innerHTML=`<div class="metric"><span>Incoming events</span><b>${number(k.total)}</b><small>Received from business channels</small></div><div class="metric"><span>Demand captured</span><b>${number(k.captured)}</b><small>Analysed and added automatically</small></div><div class="metric"><span>Needs context</span><b>${number(k.needs_context)}</b><small>Outcome still to confirm</small></div><div class="metric"><span>Needs retry</span><b>${number(k.failed)}</b><small>Retained so processing can be retried</small></div>`;
   $('intake-feed').innerHTML=data.items.length?data.items.map(item=>`<article class="intake-event"><div class="intake-event-top"><span class="tag">${esc(item.source_name)}</span><time datetime="${esc(item.received_at)}">${esc(timeLabel(item.received_at))}</time><span class="tag ${item.state==='captured'?'green':item.state==='needs_context'?'amber':''}">${esc(item.state_name)}</span></div><blockquote>${esc(item.text)}</blockquote><p>${esc(item.detail||'Processing incoming request…')}</p><div class="intake-event-actions">${item.signal_id?`<button class="text-button" data-open-incoming="${item.signal_id}">View request & next step →</button>`:''}${item.state==='needs_context'?`<button class="button small" data-intake="${item.id}" data-intake-action="confirm_unmet">Confirm missed request</button><button class="text-button" data-intake="${item.id}" data-intake-action="dismiss">No missed request</button>`:''}${item.state==='failed'?`<button class="button small" data-intake="${item.id}" data-intake-action="retry">Retry analysis</button>`:''}</div></article>`).join(''):`<div class="empty-card"><h3>Your channels will bring the requests here.</h3><p>${cfg.demo?'Send the synthetic sample events to see automatic capture, analysis and an enquiry that needs more context.':'Connect a business channel to begin. New events are processed on the server and appear here automatically.'}</p><a class="button" href="#connections">View channels →</a></div>`;
-  $('channel-cards').innerHTML=data.channels.map(channel=>`<article class="card channel-card"><div class="channel-card-top"><span class="channel-avatar">${esc(channel.name.slice(0,2).toUpperCase())}</span><span class="tag ${channel.failures?'amber':channel.events?'green':''}">${channel.failures?'Needs attention':channel.events?'Events received':cfg.demo?'No sample traffic':data.relay_configured?'Waiting for first event':'Setup needed'}</span></div><h2>${esc(channel.name)}</h2><p>${esc(channel.description)}</p><div class="channel-card-bottom"><b>${number(channel.events)} ${channel.events===1?'event':'events'}</b><small>${esc(timeLabel(channel.last_event_at))}</small></div></article>`).join('');
+  $('channel-cards').innerHTML=data.channels.map(channel=>{
+    const provider=providers[channel.id==='email'?'gmail':channel.id];
+    const connected=provider?.state==='listening'||['verified','receiving'].includes(provider?.state);
+    const attention=channel.failures||provider?.state==='attention';
+    const label=attention?'Needs attention':channel.events?'Events received':cfg.demo?'No sample traffic':connected||data.relay_configured?'Waiting for first event':provider?.configured?'Finish connecting':'Setup needed';
+    return `<article class="card channel-card"><div class="channel-card-top"><span class="channel-avatar">${esc(channel.name.slice(0,2).toUpperCase())}</span><span class="tag ${attention?'amber':channel.events||connected?'green':''}">${label}</span></div><h2>${esc(channel.name)}</h2><p>${esc(channel.description)}</p><div class="channel-card-bottom"><b>${number(channel.events)} ${channel.events===1?'event':'events'}</b><small>${esc(timeLabel(channel.last_event_at))}</small></div></article>`;
+  }).join('');
+  if(connections)renderProviders(connections);
+}
+function renderProviders(data){
+  if(cfg.demo||!$('provider-connections'))return;
+  const wa=data.providers.whatsapp, gmail=data.providers.gmail;
+  $('provider-connections').innerHTML=`<article class="card provider-card"><div class="card-kicker">WHATSAPP BUSINESS · META CLOUD API</div><h2>Receive real WhatsApp enquiries</h2><span class="tag ${wa.state==='receiving'?'green':wa.state==='verified'?'blue':'amber'}">${wa.state==='receiving'?'Messages received':wa.state==='verified'?'Webhook verified':wa.configured?'Waiting for verification':'Setup needed'}</span><p>Incoming text messages are captured and analysed automatically. Replies and media downloads are not enabled.</p>${wa.callback_url?`<label>Callback URL</label><code class="callback-url">${esc(wa.callback_url)}</code>`:'<p class="footnote">Set the public HTTPS address on the server to show the callback URL.</p>'}<p class="footnote">${wa.last_message_at?'Last message: '+esc(timeLabel(wa.last_message_at)):wa.verified_at?'Verified: '+esc(timeLabel(wa.verified_at)):'Your administrator configures the Meta app secret, phone number ID and verification token on the server.'}</p></article><article class="card provider-card"><div class="card-kicker">GMAIL · READ-ONLY DEMO LABEL</div><h2>Receive real email enquiries</h2><span class="tag ${gmail.state==='listening'?'green':'amber'}">${gmail.state==='listening'?'Listening':gmail.state==='attention'?'Needs attention':gmail.configured?'Ready to connect':'Setup needed'}</span><p>${esc(gmail.message||'Start the listener to receive new enquiries.')}</p><div class="provider-detail"><span>Watched label</span><b>${esc(gmail.label)}</b></div><p class="footnote">${gmail.last_success_at?'Last successful check: '+esc(timeLabel(gmail.last_success_at)):'Existing mailbox messages are not imported when the label is first connected.'}</p><button class="button small" id="check-new-email" ${gmail.configured?'':'disabled'}>Check new email</button></article>`;
+  if($('check-new-email'))$('check-new-email').onclick=()=>busy($('check-new-email'),'Checking…',async()=>{
+    try{const result=await api('/api/connections/gmail/check',{method:'POST',body:'{}'});await Promise.all([loadIntake(),refresh()]);toast(result.state==='busy'?'The Gmail listener is already checking for new enquiries.':result.baseline?'Gmail is listening. Send a new demo enquiry now.':`${result.imported||0} new emails processed.`);}
+    catch(error){toast(error.message,true);loadIntake().catch(()=>{});}
+  });
 }
 document.addEventListener('click',async event=>{
   const button=event.target.closest('button');if(!button)return;

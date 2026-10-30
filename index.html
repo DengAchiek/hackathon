@@ -41,6 +41,7 @@
      <div class="top-actions">
       <a class="button small" href="#activity">Channel activity ↗</a>
       <span class="workspace-indicator" id="workspace-status" role="status">Loading workspace…</span>
+      {% if not demo and session.get('workspace_authenticated') %}<form action="/logout" method="post"><input type="hidden" name="csrf" value="{{ config.csrf }}"><button class="button small" type="submit">Sign out</button></form>{% endif %}
       <a class="button small" href="#capture">＋ Add a note</a>
   </div>
 </header>
@@ -358,6 +359,7 @@
     </div>
   </div>
   <div class="channel-explainer"><h2>Connect once. Keep the requests.</h2><p>Your administrator connects each business channel to the intake service. After setup, new events are received, analysed and added to the workspace automatically. Voice channels supply transcripts.</p></div>
+  {% if demo %}<div class="card provider-notice"><h2>Ready for real messages?</h2><p>Connect WhatsApp Business and your Gmail demo label in the private live workspace. These sample records stay separate.</p><a class="button" href="/dashboard#connections">Open live channel setup →</a></div>{% else %}<div id="provider-connections" class="connection-grid"><div class="empty-card">Checking WhatsApp and Gmail…</div></div>{% endif %}
   <div class="connection-grid" id="channel-cards"><div class="empty-card">Checking channel activity…</div></div>
   <div class="card import-card">
     <div class="section-heading">

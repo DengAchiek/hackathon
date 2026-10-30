@@ -6,7 +6,7 @@ import os
 import re
 from datetime import datetime, timezone
 
-from flask import jsonify, request
+from flask import g, jsonify, request
 
 from intelligence import CURRENCIES, SOURCE_NAMES
 
@@ -17,8 +17,8 @@ CHANNELS = {
     'rejected_quote': 'rejected_quote', 'abandoned_enquiry': 'abandoned_enquiry',
 }
 CHANNEL_HELP = {
-    'whatsapp': 'Forward incoming conversations from your messaging provider.',
-    'email': 'Forward selected enquiries from your business email automation.',
+    'whatsapp': 'Receive incoming text enquiries from your WhatsApp Business account.',
+    'email': 'Receive selected enquiries from your dedicated business email label or relay.',
     'chatbot': 'Send customer messages and their conversation outcome from your website chatbot.',
     'sales_notes': 'Forward saved notes from your sales system.',
     'voice_notes': 'Forward completed transcripts from your voice-note service.',
@@ -126,9 +126,14 @@ def register_intake(app, *, db, save_signal, is_demo, default_currency):
                 if event['qty'] is not None: fields['qty'] = event['qty']
                 if event['channel'] == 'stockout': fields['reason'] = 'out_of_stock'
                 external = 'incoming-' + hashlib.sha256(f"{event['channel']}:{event['event_id']}".encode()).hexdigest()
-                saved = save_signal(event['text'], event['source'], event['customer'],
-                                    currency=event['currency'], external_id=external, fields=fields,
-                                    verified=False, commit=False, event=event['channel'] == 'stockout')
+                previous = g.get('local_extraction_only', False)
+                g.local_extraction_only = True
+                try:
+                    saved = save_signal(event['text'], event['source'], event['customer'],
+                                        currency=event['currency'], external_id=external, fields=fields,
+                                        verified=False, commit=False, event=event['channel'] == 'stockout')
+                finally:
+                    g.local_extraction_only = previous
                 signal_id = saved['id']
             conn.execute('UPDATE intake_events SET state=?,detail=?,signal_id=?,attempts=attempts+1,updated_at=? WHERE id=?',
                          (state, detail, signal_id, datetime.now(timezone.utc).isoformat(), row['id']))
@@ -229,3 +234,5 @@ def register_intake(app, *, db, save_signal, is_demo, default_currency):
                 return jsonify(body), status
             items.append(response)
         return jsonify(items=items, synthetic=True, message='Five synthetic channel events processed. Repeats are counted once.')
+
+    return receive
