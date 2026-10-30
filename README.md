@@ -1,5 +1,5 @@
 ---
-title: GhostDemand PesaShield
+title: Mteja Insight
 emoji: 🛡️
 colorFrom: blue
 colorTo: green
@@ -7,7 +7,7 @@ sdk: docker
 app_port: 7860
 ---
 
-# GhostDemand AI
+# Mteja Insights
 
 Capture retail enquiries, identify missed demand and organise follow-ups. Extraction and classification run on the backend; the dashboard shows business activity and evidence.
 
